@@ -1,8 +1,27 @@
 Rails.application.routes.draw do
+  get 'sessions/start_test'
+
+  get 'sessions/clear'
+
+  get 'sessions/debug'
+
+  get 'sessions/new'
+
+  get 'sessions/destroy'
+  
+  match '/auth/:provider/callback', :to => 'sessions#create', :via => [:get, :post]
+  match 'auth/failure', :to => 'sessions#failure', :via => [:get, :post]
+  get 'sessions/destroy', :as => 'logout'
+  get 'sessions/start_test'
+  get 'sessions/clear'
+  get 'session/debug'
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
   get 'welcome/landing', :as => :welcome_landing
   root 'welcome#landing'
+  
+  
   # You can have the root of your site routed with "root"
   # root 'welcome#index'
 
