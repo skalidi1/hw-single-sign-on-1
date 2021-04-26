@@ -12,8 +12,12 @@ class SessionsController < ApplicationController
   end
 
   def create
-    p auth_hash
-    user = User.create!("name" => auth_hash[:info][:name], "email" => auth_hash[:info][:email])
+    user = User.create_with_omniauth(auth_hash['info'])
+    auth = Authorization.create_with_omniauth(auth_hash, user)
+    session[:user_id] = auth.user.id
+    self.current_user= auth.user
+    message = "Welcome #{user.name}! You have signed up via #{auth.provider}."
+    flash[:notice] = message
     #debug
   end
   
@@ -55,5 +59,6 @@ class SessionsController < ApplicationController
   def auth_hash
     #ensures that it's only retrieved once per cycle
     @auth_hash ||= request.env['omniauth.auth']
+    p @auth_hash
   end
 end

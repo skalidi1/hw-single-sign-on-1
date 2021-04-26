@@ -17,17 +17,20 @@ RSpec.describe SessionsController, type: :controller do
           it "creates a User" do
             expect { post :create, provider: :github }.to change(User, :count).by(1)
           end        
-          it "creates an Authorization", :pending => true do
+          it "creates an Authorization" do
+            expect { post :create, provider: :github }.to change(Authorization, :count).by(1)
+          end
+          it "creates a current_user" do
+            expect(controller).to receive(:current_user=).exactly(1).times
             post :create, provider: :github
           end
-          it "creates a current_user", :pending => true do
+          it "creates a session" do
             post :create, provider: :github
+            expect(session[:user_id]).to eq(1)
           end
-          it "creates a session", :pending => true do
+          it "sets a flash message" do
             post :create, provider: :github
-          end
-          it "sets a flash message", :pending => true do
-            post :create, provider: :github
+            expect(flash[:notice]).to match(/^Welcome #{user.name}! You have signed up via #{auth.provider}.$/)
           end              
         end
       end

@@ -26,6 +26,7 @@ gem 'omniauth'                        # flexible, multi-provider authentication 
 gem 'omniauth-github'                 # omniauth strategy for provider github
 gem 'figaro'                          # keeps our secrets safe
 
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
@@ -48,6 +49,7 @@ group :development, :test do
   gem 'launchy'
   gem 'rspec-rails', '3.7.2'
   gem 'ZenTest', '4.11.2'  
+  gem 'factory_girl_rails'
 end
 
 group :development do
