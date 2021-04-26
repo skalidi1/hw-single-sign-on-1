@@ -23,7 +23,8 @@ module NavigationHelpers
     #
     #   when /^(.*)'s profile page$/i
     #     user_profile_path(User.find_by_login($1))
-
+    when /^the RottenPotatoes edit Profile Path for "([^"]*)"$/
+      edit_user_profile_path(1, 2)
     else
       begin
         page_name =~ /^the (.*) page$/

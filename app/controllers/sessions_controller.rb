@@ -12,13 +12,20 @@ class SessionsController < ApplicationController
   end
 
   def create
-    user = User.create_with_omniauth(auth_hash['info'])
-    auth = Authorization.create_with_omniauth(auth_hash, user)
-    session[:user_id] = auth.user.id
-    self.current_user= auth.user
-    message = "Welcome #{user.name}! You have signed up via #{auth.provider}."
-    flash[:notice] = message
-    #debug
+    begin
+      @user = User.create_with_omniauth(auth_hash['info'])
+      auth = Authorization.create_with_omniauth(auth_hash, @user)
+      session[:user_id] = auth.user.id
+      self.current_user= auth.user
+      message = "Welcome #{@user.name}! You have signed up via #{auth.provider}."
+      flash[:notice] = message
+      @profile = @user.create_profile
+      redirect_to edit_user_profile_path(@user,@profile)
+    rescue ActiveRecord::RecordInvalid,  Exception => exception
+      flash[:warning] = "#{exception.class}: #{exception.message}"
+      redirect_to welcome_landing_path and return
+    end
+    debug
   end
   
   def debug
