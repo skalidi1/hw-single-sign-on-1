@@ -30,5 +30,21 @@ RSpec.describe User, type: :model do
         expect {User.create_with_omniauth(info2)}.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Email must be for Binghamton University")
       end
     end
+    context 'a previous user exists' do
+      before(:each) do
+        @user =  User.create!(name: 'SUNY Tester', email: 'stester@binghamton.edu')
+      end 
+      it "can recover the previous user" do
+        expect(User.find_with_auth_hash(OmniAuth.config.mock_auth[:github][:info])).to eq(@user)
+      end
+    end
+    context 'a previous user does not exist' do
+      before(:each) do
+        @user =  User.create!(name: 'Other Tester', email: 'otester@binghamton.edu')
+      end 
+      it "can't recover a previous user that does not exist" do
+          expect(User.find_with_auth_hash(OmniAuth.config.mock_auth[:github])).to eq(nil)
+      end
+    end
   end 
 end

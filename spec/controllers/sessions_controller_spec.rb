@@ -15,25 +15,32 @@ RSpec.describe SessionsController, type: :controller do
           let(:auth1) {@auth}
           let(:user1) {@user}
           it "checks to see if a previous authorization exists" do
+            expect(Authorization).to receive(:exists?).with(OmniAuth.config.mock_auth[:github] ).and_return(true)
             post :create, provider: :github
           end
           it 'recovers the previous authorization' do
+            expect(auth1).to have_attributes(provider: "github", uid: "123456", user_id: auth1.id)
             post :create, provider: :github
           end
           it 'recovers the previous user' do
+            expect(user1).to have_attributes(name: 'SUNY Tester', email: 'stester@binghamton.edu', id: user1.id)
             post :create, provider: :github
           end
           it 'sets the session' do
             post :create, provider: :github
+            expect(session[:user_id]).to eq(user1.id)
           end
           it 'sets the current user' do
+            expect(controller).to receive(:current_user=).exactly(1).times
             post :create, provider: :github
           end
           it 'sets a flash message' do
             post :create, provider: :github
+            expect(flash[:notice]).to match(/^Welcome back #{user1.name}! You have logged in via #{auth1.provider}.$/)
           end
           it 'redirects to the home page' do
             post :create, provider: :github
+            expect(response).to redirect_to(movies_path) 
           end
         end
       end
@@ -51,6 +58,7 @@ RSpec.describe SessionsController, type: :controller do
           let(:user) {double('User', name: 'SUNY Tester', email: 'stester@binghamton.edu', id: id1)}
           let(:auth) {double('Authorization', provider: "github", uid: "123456", user_id: id1, user: double('User', name: 'SUNY Tester', email: 'stester@binghamton.edu', id: id1))}    
           it 'checks to see that a previous authorization does not exist' do
+            expect(Authorization).to receive(:exists?).with(OmniAuth.config.mock_auth[:github] ).and_return(false)
             post :create, provider: :github
           end  
           it "creates a User" do

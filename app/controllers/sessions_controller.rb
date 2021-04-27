@@ -1,31 +1,37 @@
 class SessionsController < ApplicationController
-  def start_test
-  end
+  skip_before_action :keep_out_unless_logged_in, only: [:create, :clear, :debug]
 
   def clear
   end
 
-  def debug
-  end
-
-  def new
-  end
-
   def create
     begin
-      @user = User.create_with_omniauth(auth_hash['info'])
-      auth = Authorization.create_with_omniauth(auth_hash, @user)
-      session[:user_id] = auth.user.id
-      self.current_user= auth.user
-      message = "Welcome #{@user.name}! You have signed up via #{auth.provider}."
-      flash[:notice] = message
-      @profile = @user.create_profile
-      redirect_to edit_user_profile_path(@user,@profile)
+      p Authorization.exists?(auth_hash)
+      if Authorization.exists?(auth_hash) #login
+        auth = Authorization.find_with_auth_hash(auth_hash)
+        @user = User.find_with_auth_hash(auth_hash['info'])
+        p auth
+        p @user
+        session[:user_id] = auth.user.id
+        self.current_user= auth.user
+        message = "Welcome back #{@user.name}! You have logged in via #{auth.provider}."
+        flash[:notice] = message
+        redirect_to movies_path
+      else #register
+        @user = User.create_with_omniauth(auth_hash['info'])
+        auth = Authorization.create_with_omniauth(auth_hash, @user)
+        session[:user_id] = auth.user.id
+        self.current_user= auth.user
+        message = "Welcome #{@user.name}! You have signed up via #{auth.provider}."
+        flash[:notice] = message
+        @profile = @user.create_profile
+        redirect_to edit_user_profile_path(@user,@profile)
+      end
     rescue ActiveRecord::RecordInvalid,  Exception => exception
       flash[:warning] = "#{exception.class}: #{exception.message}"
-      redirect_to welcome_landing_path and return
+      redirect_to welcome_landing_path
     end
-    debug
+    #debug
   end
   
   def debug
@@ -40,6 +46,7 @@ class SessionsController < ApplicationController
         puts "Value: #{value}"
       end
     end
+    redirect_to welcome_landing_path
   end
   
   def failure

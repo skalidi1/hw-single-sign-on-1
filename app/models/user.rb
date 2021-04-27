@@ -19,4 +19,9 @@ class User < ActiveRecord::Base
     Profile.create(user_id: self.id)
   end
   
+  def self.find_with_auth_hash info
+    User.find_by(name: info['name'], email: info['email'])
+    # OR
+    #User.where(name: info['name'], email: info['email'])[0]
+  end
 end
