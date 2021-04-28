@@ -2,11 +2,12 @@ class SessionsController < ApplicationController
   skip_before_action :keep_out_unless_logged_in, only: [:create, :clear, :debug]
 
   def clear
+    session.clear
+    redirect_to welcome_landing_path
   end
 
   def create
     begin
-      p Authorization.exists?(auth_hash)
       if Authorization.exists?(auth_hash) #login
         auth = Authorization.find_with_auth_hash(auth_hash)
         @user = User.find_with_auth_hash(auth_hash['info'])
