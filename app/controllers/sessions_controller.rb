@@ -7,6 +7,7 @@ class SessionsController < ApplicationController
   end
 
   def create
+    @action = 'login'
     begin
       if Authorization.exists?(auth_hash) #login
         auth = Authorization.find_with_auth_hash(auth_hash)
@@ -51,9 +52,19 @@ class SessionsController < ApplicationController
   end
   
   def failure
+    begin
+    rescue Exception => exception    
+      flash[:warning] = "#{exception.class}:  #{exception.message}" 
+      redirect_to welcome_landing_path
+    end 
   end
 
   def destroy
+    message = "#{self.current_user.name} has logged out."
+    self.current_user = nil
+    session.delete(:user_id)
+    flash[:notice] = message
+    redirect_to welcome_landing_path
   end
     
   private

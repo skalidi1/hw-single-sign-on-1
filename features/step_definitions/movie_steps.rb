@@ -25,6 +25,18 @@ end
    expect(page.body).to have_content(message)
  end
 
+
+# features/step_definitions/movie_steps.rb
+
+Given /I am logged into RottenPotatoes/ do
+  steps %Q{
+    Given I am on the RottenPotatoes Landing Page   
+    And I press "Register or Login with GitHub"
+    And I am on the RottenPotatoes Home Page
+    }
+end
+
+
 # Then /^I will see "([^"]*)"$/ do |message|
 #  puts page.body # <---
 #  expect(page.body).to have_content(message)
